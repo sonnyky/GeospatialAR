@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Samples/ARCore Extensions/1.39.0/Geospatial Sample/Scenes/Geospatial.unity
+    guid: 1ed15e9657253406185e4b2c7c5a4fc4
+  m_configObjects:
+    UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: fd037e7456f9c6c439666052b401f773,
+      type: 2}
+    UnityEditor.XR.ARKit.ARKitSettings: {fileID: 11400000, guid: aa8e2d7291869a240bb4541c0df2d65a,
+      type: 2}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 48adb5577eed9d4458fbdb0d3ad54f4c,
+      type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 7ff458117daa2ba46aad5b73d6ef2710,
+      type: 2}
