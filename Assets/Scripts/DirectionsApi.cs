@@ -11,7 +11,8 @@ public class DirectionsApi : IApiRequest
 
     public IEnumerator GetRequestAsync(string origin, string destination, Action<string> callback)
     {
-        string fullUri = _baseURL + "origin=" + origin + "&destination=" + destination + "&key=AIzaSyAmU69Xc-N2Ht8ztYS8D2e9CGt3GQpNFEE";
+        string fullUri = _baseURL + "origin=" + "Coaska Bayside Stores" + "&destination=" + "Yokosuka Chuo station" + "&mode=walking&key=AIzaSyAmU69Xc-N2Ht8ztYS8D2e9CGt3GQpNFEE";
+        Debug.Log(fullUri);
         using (UnityWebRequest webRequest = UnityWebRequest.Get(fullUri))
         {
             // Request and wait for the desired page.

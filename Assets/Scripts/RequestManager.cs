@@ -6,6 +6,8 @@ using UnityEngine;
 public class RequestManager : MonoBehaviour
 {
     static RequestManager instance;
+
+    // Directions API
     DirectionsApi directionsApi;
 
     public RequestManager Instance
@@ -21,17 +23,12 @@ public class RequestManager : MonoBehaviour
         }
     }
 
-    public void RequestDirections(string origin, string destination)
+    public void RequestDirections(string origin, string destination, Action<string> callback)
     {
         if (directionsApi == null)
         {
             directionsApi = new DirectionsApi();
         }
-        StartCoroutine(directionsApi.GetRequestAsync(origin, destination, Process));
-    }
-
-    public void Process(string result)
-    {
-        Debug.Log("after callback: " + result);
+        StartCoroutine(directionsApi.GetRequestAsync(origin, destination, callback));
     }
 }
