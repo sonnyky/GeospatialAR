@@ -3,7 +3,7 @@ using UnityEngine;
 public class AutoRotate : MonoBehaviour
 {
     // Rotation speed in degrees per second
-    public float rotationSpeed = 10.0f;
+    public float rotationSpeed = 30.0f;
 
     // Update is called once per frame
     void Update()

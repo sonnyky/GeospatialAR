@@ -4336,9 +4336,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AltType: 0
-  _latitude: 35.282381879197786
+  _latitude: 35.28238187919777
   _longitude: 139.6647278948603
-  _altitude: 38
+  _altitude: 38.00000011914584
   _altitudeOffset: 0
 --- !u!1 &1769789001
 GameObject:

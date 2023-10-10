@@ -8,13 +8,14 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.XR.ARFoundation;
 
 public class DirectionsManager : MonoBehaviour
 {
     [SerializeField] TMP_InputField origin;
     [SerializeField] TMP_InputField destination;
 
-    RequestManager requestManager;
+    [SerializeField] RequestManager requestManager;
 
     List<StartLocation> allLocations;
     DirectionsDataRoot directionsDataRoot;
@@ -22,10 +23,13 @@ public class DirectionsManager : MonoBehaviour
     [SerializeField] GameObject markerObject;
     List<GameObject> spawnedMarkerObjects;
 
+    [SerializeField] ARAnchorManager anchorManager;
+
+    [SerializeField] TMP_Text debug;
+
     // Start is called before the first frame update
     void Start()
     {
-        requestManager = new RequestManager().Instance;
         allLocations = new List<StartLocation>();
         spawnedMarkerObjects = new List<GameObject>();
     }
@@ -44,6 +48,7 @@ public class DirectionsManager : MonoBehaviour
         directionsDataRoot = JsonConvert.DeserializeObject<DirectionsDataRoot>(result);
         GetAllLocations(directionsDataRoot);
         ClearMarkerObjects();
+        debug.text = "got all locations: " + allLocations.Count.ToString();
         SpawnMarkerObjects();
     }
     public void GetAllLocations(DirectionsDataRoot root)
@@ -74,16 +79,23 @@ public class DirectionsManager : MonoBehaviour
     {
         foreach(StartLocation loc in allLocations)
         {
-            // spawn marker
-            GameObject marker = Instantiate(markerObject);
+            ARGeospatialAnchor anchor = null;
 
-            ARGeospatialCreatorAnchor anchor = marker.GetComponent<ARGeospatialCreatorAnchor>();
-            anchor.Longitude = loc.lng;
-            anchor.Latitude = loc.lat;
-            marker.transform.position = anchor.transform.position;
-            marker.transform.rotation = anchor.transform.rotation;
-            Vector3 newScale = anchor.transform.localScale * 200f;
-            marker.transform.localScale = newScale;
+            anchor = anchorManager.AddAnchor(
+                    loc.lat, loc.lng, 39.0, Quaternion.identity);
+            anchor.gameObject.SetActive(true);
+
+            if (anchor != null )
+            {
+                // spawn marker
+                GameObject marker = Instantiate(markerObject, anchor.transform);
+                marker.transform.parent = anchor.gameObject.transform;
+                spawnedMarkerObjects.Add(marker);
+            }
+            else
+            {
+                debug.text = "anchor is null";
+            }
         }
     }
 
