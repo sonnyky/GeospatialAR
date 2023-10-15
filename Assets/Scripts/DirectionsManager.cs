@@ -1,5 +1,6 @@
 using Google.XR.ARCoreExtensions;
 using Google.XR.ARCoreExtensions.GeospatialCreator.Internal;
+using Google.XR.ARCoreExtensions.Samples.Geospatial;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -27,6 +28,8 @@ public class DirectionsManager : MonoBehaviour
 
     [SerializeField] TMP_Text debug;
 
+    [SerializeField] GeospatialController geospatialController;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,6 +44,20 @@ public class DirectionsManager : MonoBehaviour
         requestManager.RequestDirections(origin.text, destination.text, Process);
     }
 
+    private void Update()
+    {
+        foreach(GameObject go in spawnedMarkerObjects)
+        {
+            Vector3 directionToCamera = Camera.main.transform.position - go.transform.position;
+            float rayLength = directionToCamera.magnitude;
+            Ray ray = new Ray(go.transform.position, directionToCamera.normalized);
+            if (!geospatialController.ObjectIsObstructedByGeometry(ray))
+            {
+                go.SetActive(true);
+            }
+        }
+    }
+
     public void Process(string result)
     {
         Debug.Log("after callback: " + result);
@@ -48,7 +65,6 @@ public class DirectionsManager : MonoBehaviour
         directionsDataRoot = JsonConvert.DeserializeObject<DirectionsDataRoot>(result);
         GetAllLocations(directionsDataRoot);
         ClearMarkerObjects();
-        debug.text = "got all locations: " + allLocations.Count.ToString();
         SpawnMarkerObjects();
     }
     public void GetAllLocations(DirectionsDataRoot root)
@@ -91,6 +107,8 @@ public class DirectionsManager : MonoBehaviour
                 GameObject marker = Instantiate(markerObject, anchor.transform);
                 marker.transform.parent = anchor.gameObject.transform;
                 spawnedMarkerObjects.Add(marker);
+                marker.SetActive(false);
+                debug.text = "spawned objects: " + spawnedMarkerObjects.Count.ToString();
             }
             else
             {

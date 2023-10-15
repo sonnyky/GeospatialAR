@@ -949,6 +949,13 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
             return (mapDistance - 2.0f) / (20.0f - 2.0f) + 1.0f;
         }
 
+        public bool ObjectIsObstructedByGeometry(Ray ray)
+        {
+            // Raycast against streetscapeGeometry.
+            List<XRRaycastHit> hitResults = new List<XRRaycastHit>();
+            return RaycastManager.RaycastStreetscapeGeometry(ray, ref hitResults);
+        }
+
         private void PlaceAnchorByScreenTap(Vector2 position)
         {
             if (_streetscapeGeometryVisibility)
