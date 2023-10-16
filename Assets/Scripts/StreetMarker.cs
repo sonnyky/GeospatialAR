@@ -1,9 +1,14 @@
 using UnityEngine;
 
-public class AutoRotate : MonoBehaviour
+public class StreetMarker : MonoBehaviour
 {
     // Rotation speed in degrees per second
     public float rotationSpeed = 30.0f;
+
+    private void Start()
+    {
+        
+    }
 
     // Update is called once per frame
     void Update()
