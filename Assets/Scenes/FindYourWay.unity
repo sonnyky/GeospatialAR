@@ -947,10 +947,10 @@ MonoBehaviour:
   StreetscapeGeometryManager: {fileID: 691323914}
   ARCoreExtensions: {fileID: 1476232295}
   StreetscapeGeometryMaterialBuilding:
-  - {fileID: 2100000, guid: 7894c3ef401af4931aa6a101b5fbd724, type: 2}
-  - {fileID: 2100000, guid: 4b2d0d8634e20448cb7ef06579fe9bbb, type: 2}
-  - {fileID: 2100000, guid: 3a5a66d1f5c534a27a708c3f235eaa5d, type: 2}
-  StreetscapeGeometryMaterialTerrain: {fileID: 2100000, guid: 775ce3c1866ce4692b5d2cd9c1848a39,
+  - {fileID: 2100000, guid: 8e822d4a21df7f948958ea2854fc8aac, type: 2}
+  - {fileID: 2100000, guid: 8e822d4a21df7f948958ea2854fc8aac, type: 2}
+  - {fileID: 2100000, guid: 8e822d4a21df7f948958ea2854fc8aac, type: 2}
+  StreetscapeGeometryMaterialTerrain: {fileID: 2100000, guid: 8e822d4a21df7f948958ea2854fc8aac,
     type: 2}
   GeospatialPrefab: {fileID: 5831908950388203684, guid: f09a13e3d47394ab588884ffd124d732,
     type: 3}
@@ -3492,8 +3492,6 @@ MonoBehaviour:
   destination: {fileID: 825676845}
   requestManager: {fileID: 1477181426}
   debugLongLat: {fileID: 1097313196}
-  debugMarkersNum: {fileID: 0}
-  debugActiveMarkers: {fileID: 0}
   geospatialController: {fileID: 384014291}
 --- !u!1 &1074335149
 GameObject:
