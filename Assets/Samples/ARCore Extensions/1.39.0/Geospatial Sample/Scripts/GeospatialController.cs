@@ -356,6 +356,11 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
             VPSCheckCanvas.SetActive(false);
         }
 
+        public bool IsGeomteryEnabled()
+        {
+            return _streetscapeGeometryVisibility;
+        }
+
         /// <summary>
         /// Callback handling "Geometry" toggle event in AR View.
         /// </summary>

@@ -42,12 +42,6 @@ public class DirectionsManager : MonoBehaviour
         requestManager.RequestDirections(longLatCurrent, destination.text, Process);
     }
 
-    public void CheckRaycast()
-    {
-      
-       
-    }
-
     public void Process(string result)
     {
         Debug.Log("after callback: " + result);
