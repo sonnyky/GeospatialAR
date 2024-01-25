@@ -1,6 +1,7 @@
+using System.Collections;
 using UnityEngine;
 
-public class AutoRotate : MonoBehaviour
+public class StreetMarker : MonoBehaviour
 {
     // Rotation speed in degrees per second
     public float rotationSpeed = 30.0f;
@@ -13,5 +14,6 @@ public class AutoRotate : MonoBehaviour
 
         // Rotate around the Y axis
         transform.Rotate(0, 0, rotationThisFrame);
+
     }
 }

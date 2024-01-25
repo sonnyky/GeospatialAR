@@ -96,6 +96,8 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
         /// </summary>
         public GameObject GeospatialPrefab;
 
+        public GameObject MarkerPrefab;
+
         /// <summary>
         /// A 3D object that presents a Geospatial Terrain anchor.
         /// </summary>
@@ -226,7 +228,7 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
         /// <summary>
         /// The limitation of how many Geospatial Anchors can be stored in local storage.
         /// </summary>
-        private const int _storageLimit = 20;
+        private const int _storageLimit = 50;
 
         /// <summary>
         /// Accuracy threshold for orientation yaw accuracy in degrees that can be treated as
@@ -308,6 +310,8 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
         private IEnumerator _startLocationService = null;
         private IEnumerator _asyncCheck = null;
 
+        public GeospatialPose currentPose;
+
         /// <summary>
         /// Callback handling "Get Started" button click event in Privacy Prompt.
         /// </summary>
@@ -350,6 +354,11 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
         public void OnContinueClicked()
         {
             VPSCheckCanvas.SetActive(false);
+        }
+
+        public bool IsGeomteryEnabled()
+        {
+            return _streetscapeGeometryVisibility;
         }
 
         /// <summary>
@@ -743,6 +752,7 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
                 pose.VerticalAccuracy.ToString("F2"),
                 pose.EunRotation.ToString("F1"),
                 pose.OrientationYawAccuracy.ToString("F1"));
+                currentPose = pose;
             }
             else
             {
@@ -762,6 +772,12 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
             _addedStreetscapeGeometries = eventArgs.Added;
             _updatedStreetscapeGeometries = eventArgs.Updated;
             _removedStreetscapeGeometries = eventArgs.Removed;
+        }
+
+        public bool ObstructedBygeometry(Ray ray)
+        {
+            List<XRRaycastHit> hitResults = new List<XRRaycastHit>();
+            return RaycastManager.RaycastStreetscapeGeometry(ray, ref hitResults);
         }
 
         /// <summary>
@@ -949,12 +965,25 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
             return (mapDistance - 2.0f) / (20.0f - 2.0f) + 1.0f;
         }
 
-        public bool ObjectIsObstructedByGeometry(Ray ray)
+        #region custom
+        public void PlaceStreetMarkerAnchor(double lat, double lng)
         {
-            // Raycast against streetscapeGeometry.
-            List<XRRaycastHit> hitResults = new List<XRRaycastHit>();
-            return RaycastManager.RaycastStreetscapeGeometry(ray, ref hitResults);
+
+            GeospatialAnchorHistory history = new GeospatialAnchorHistory(
+               lat, lng, 39.0,
+               AnchorType.Geospatial, Quaternion.identity);
+
+            var anchor = PlaceGeospatialAnchorForStreetMarker(history);
+            if (anchor != null)
+            {
+                _historyCollection.Collection.Add(history);
+            }
+
+            ClearAllButton.gameObject.SetActive(_anchorObjects.Count > 0);
+            SaveGeospatialAnchorHistory();
+            
         }
+        #endregion
 
         private void PlaceAnchorByScreenTap(Vector2 position)
         {
@@ -1111,6 +1140,49 @@ namespace Google.XR.ARCoreExtensions.Samples.Geospatial
                     }
 
                     break;
+            }
+
+            return anchor;
+        }
+
+        private ARGeospatialAnchor PlaceGeospatialAnchorForStreetMarker(
+           GeospatialAnchorHistory history)
+        {
+            bool terrain = history.AnchorType == AnchorType.Terrain;
+            Quaternion eunRotation = CreateRotation(history);
+            ARGeospatialAnchor anchor = null;
+
+            if (terrain)
+            {
+                // Anchor returned will be null, the coroutine will handle creating the
+                // anchor when the promise is done.
+                ResolveAnchorOnTerrainPromise promise =
+                    AnchorManager.ResolveAnchorOnTerrainAsync(
+                        history.Latitude, history.Longitude,
+                        0, eunRotation);
+
+                StartCoroutine(CheckTerrainPromise(promise, history));
+                return null;
+            }
+            else
+            {
+                anchor = AnchorManager.AddAnchor(
+                    history.Latitude, history.Longitude, history.Altitude, eunRotation);
+            }
+
+            if (anchor != null)
+            {
+                GameObject anchorGO = history.AnchorType == AnchorType.Geospatial ?
+                    Instantiate(MarkerPrefab, anchor.transform) :
+                    Instantiate(TerrainPrefab, anchor.transform);
+                anchor.gameObject.SetActive(!terrain);
+                anchorGO.transform.parent = anchor.gameObject.transform;
+                _anchorObjects.Add(anchor.gameObject);
+                SnackBarText.text = GetDisplayStringForAnchorPlacedSuccess();
+            }
+            else
+            {
+                SnackBarText.text = GetDisplayStringForAnchorPlacedFailure();
             }
 
             return anchor;

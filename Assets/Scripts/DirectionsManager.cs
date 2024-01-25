@@ -20,13 +20,9 @@ public class DirectionsManager : MonoBehaviour
 
     List<StartLocation> allLocations;
     DirectionsDataRoot directionsDataRoot;
-
-    [SerializeField] GameObject markerObject;
     List<GameObject> spawnedMarkerObjects;
 
-    [SerializeField] ARAnchorManager anchorManager;
-
-    [SerializeField] TMP_Text debug;
+    [SerializeField] TMP_Text debugLongLat;
 
     [SerializeField] GeospatialController geospatialController;
 
@@ -41,21 +37,9 @@ public class DirectionsManager : MonoBehaviour
     {
         Debug.Log("getting directions");
         allLocations.Clear();
-        requestManager.RequestDirections(origin.text, destination.text, Process);
-    }
-
-    private void Update()
-    {
-        foreach(GameObject go in spawnedMarkerObjects)
-        {
-            Vector3 directionToCamera = Camera.main.transform.position - go.transform.position;
-            float rayLength = directionToCamera.magnitude;
-            Ray ray = new Ray(go.transform.position, directionToCamera.normalized);
-            if (!geospatialController.ObjectIsObstructedByGeometry(ray))
-            {
-                go.SetActive(true);
-            }
-        }
+        string longLatCurrent = geospatialController.currentPose.Latitude.ToString() + "," + geospatialController.currentPose.Longitude.ToString();
+        debugLongLat.text = geospatialController.currentPose.Latitude.ToString() + ", " + geospatialController.currentPose.Longitude.ToString();
+        requestManager.RequestDirections(longLatCurrent, destination.text, Process);
     }
 
     public void Process(string result)
@@ -74,9 +58,17 @@ public class DirectionsManager : MonoBehaviour
         {
             foreach (var leg in route.legs)
             {
-                foreach (var step in leg.steps)
+                for(int j=0; j < leg.steps.Count; j++)
                 {
-                    allLocations.Add(step.start_location);
+                    //allLocations.Add(step.start_location);
+                    int numberOfPoints = 8;
+
+                    for (int i = 0; i < numberOfPoints; i++)
+                    {
+                        float t = (i + 1) / (float)(numberOfPoints + 1);
+
+                        allLocations.Add(Lerp(leg.steps[j].start_location, leg.steps[j].end_location, t));
+                    }
                 }
             }
         }
@@ -93,28 +85,22 @@ public class DirectionsManager : MonoBehaviour
 
     void SpawnMarkerObjects()
     {
-        foreach(StartLocation loc in allLocations)
+       foreach (StartLocation loc in allLocations)
         {
-            ARGeospatialAnchor anchor = null;
-
-            anchor = anchorManager.AddAnchor(
-                    loc.lat, loc.lng, 39.0, Quaternion.identity);
-            anchor.gameObject.SetActive(true);
-
-            if (anchor != null )
-            {
-                // spawn marker
-                GameObject marker = Instantiate(markerObject, anchor.transform);
-                marker.transform.parent = anchor.gameObject.transform;
-                spawnedMarkerObjects.Add(marker);
-                marker.SetActive(false);
-                debug.text = "spawned objects: " + spawnedMarkerObjects.Count.ToString();
-            }
-            else
-            {
-                debug.text = "anchor is null";
-            }
+            geospatialController.PlaceStreetMarkerAnchor(loc.lat, loc.lng);
         }
     }
 
+    public StartLocation Lerp(StartLocation start, EndLocation end, float t)
+    {
+        StartLocation midpoint = new StartLocation();
+        midpoint.lat = LerpDouble(start.lat, end.lat, t);
+        midpoint.lng = LerpDouble(start.lng, end.lng, t);
+        return midpoint;
+    }
+
+    public double LerpDouble(double a, double b, double t)
+    {
+        return a + t * (b - a);
+    }
 }
