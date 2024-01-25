@@ -61,7 +61,7 @@ public class DirectionsManager : MonoBehaviour
                 for(int j=0; j < leg.steps.Count; j++)
                 {
                     //allLocations.Add(step.start_location);
-                    int numberOfPoints = 10;
+                    int numberOfPoints = 8;
 
                     for (int i = 0; i < numberOfPoints; i++)
                     {
